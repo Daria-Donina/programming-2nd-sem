@@ -20,4 +20,4 @@ def initialize_db(n_pages):
         s.commit()
 
 
-initialize_db(5)
+initialize_db(40)
