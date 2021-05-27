@@ -16,13 +16,34 @@ def news_list():
 
 @route("/add_label/")
 def add_label():
-    # PUT YOUR CODE HERE
+    s = session()
+    record = s.query(News).filter(News.id == request.query["id"]).first()
+    record.label = request.query['label']
+    s.commit()
+
     redirect("/news")
 
 
 @route("/update")
 def update_news():
-    # PUT YOUR CODE HERE
+    news = get_news('https://news.ycombinator.com/newest')
+
+    s = session()
+    for dct in news:
+        entry = News(
+            title=dct["title"],
+            author=dct["author"],
+            comments=dct["comments"],
+            points=dct["points"],
+            url=dct["url"],
+        )
+
+        records = s.query(News).filter(News.title == entry.title and News.author == entry.author).all()
+
+        if len(records) == 0:
+            s.add(entry)
+            s.commit()
+
     redirect("/news")
 
 
