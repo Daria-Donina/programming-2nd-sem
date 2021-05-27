@@ -8,12 +8,10 @@ def extract_news(parser):
     """ Extract news from a given web page """
     news_list = []
 
-    # print(parser)
     links = parser.findAll('a', 'storylink')
     subtexts = parser.findAll('td', 'subtext')
 
     for link, subtext in zip(links, subtexts):
-        # author
         author = subtext.a.text
 
         link_comment = subtext.find('a', string=re.compile('comment'))
@@ -37,7 +35,8 @@ def extract_news(parser):
 
 def extract_next_page(parser):
     """ Extract next page URL """
-    # PUT YOUR CODE HERE
+    morelink = parser.find('a', 'morelink')['href']
+    return morelink
 
 
 def get_news(url, n_pages=1):
@@ -54,4 +53,4 @@ def get_news(url, n_pages=1):
         n_pages -= 1
     return news
 
-get_news("https://news.ycombinator.com/newest")
+print(get_news("https://news.ycombinator.com/newest", 2))
