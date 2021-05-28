@@ -1,5 +1,7 @@
 from collections import defaultdict, Counter
 from math import log
+from statistics import mean
+import string
 
 
 class NaiveBayesClassifier:
@@ -21,8 +23,8 @@ class NaiveBayesClassifier:
 
         # подсчитываем слова в каждом классе
         for line, value in zip(X, y):
+            line = clean(line).lower()
             for word in line.split(' '):
-                word = word.lower().replace("'", "")
 
                 if word not in self.words_in_classes_count:
                     self.words_in_classes_count[word] = \
@@ -45,9 +47,8 @@ class NaiveBayesClassifier:
             probs = defaultdict(float)
             for _class in self.classes_count:
                 probs[_class] = log(self.classes_probabilities[_class])
+                line = clean(line).lower()
                 for word in line.split(' '):
-                    word = word.lower().replace("'", "")
-
                     if word in self.words_in_classes_probabilities:
                         probs[_class] += log(self.words_in_classes_probabilities[word][_class])
 
@@ -55,5 +56,14 @@ class NaiveBayesClassifier:
         return y
 
     def score(self, X_test, y_test):
-        """ Returns the mean accuracy on the given test data and labels. """
-        pass
+        scoring = []
+
+        y_predicted = self.predict(X_test)
+        for predicted, expected in zip(y_predicted, y_test):
+            scoring.append(int(predicted == expected))
+        return mean(scoring)
+
+
+def clean(s):
+    translator = str.maketrans("", "", string.punctuation)
+    return s.translate(translator)
