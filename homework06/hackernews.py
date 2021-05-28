@@ -31,11 +31,11 @@ def update_news():
     s = session()
     for dct in news:
         entry = News(
-            title=dct["title"],
-            author=dct["author"],
-            comments=dct["comments"],
-            points=dct["points"],
-            url=dct["url"],
+            title=dct['title'],
+            author=dct['author'],
+            comments=dct['comments'],
+            points=dct['points'],
+            url=dct['url'],
         )
 
         records = s.query(News).filter(News.title == entry.title and News.author == entry.author).all()
@@ -49,8 +49,30 @@ def update_news():
 
 @route("/classify")
 def classify_news():
-    # PUT YOUR CODE HERE
-    pass
+    # training
+    classifier = NaiveBayesClassifier()
+
+    s = session()
+    marked = s.query(News).filter(News.label != None).all()
+
+    X_train, y_train = [], []
+    for record in marked:
+        X_train.append(record.title)
+        y_train.append(record.label)
+
+    classifier.fit(X_train, y_train)
+
+    # predicting
+    rows = s.query(News).filter(News.label == None).all()
+
+    titles = [x.title for x in rows]
+    labels = classifier.predict(titles)
+
+    for record, label in zip(rows, labels):
+        record.label = label
+
+    rows.sort(key=lambda x: x.label)
+    return template('news_template', rows=rows)
 
 
 if __name__ == "__main__":
