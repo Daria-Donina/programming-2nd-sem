@@ -55,5 +55,5 @@ def sms_test():
     model.fit(X_train, y_train)
     print(model.score(X_test, y_test))
 
-my_test()
-sms_test()
+# my_test()
+# sms_test()
